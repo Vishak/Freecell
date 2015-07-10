@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<script src="jquery-1.6.2.js"></script>
+<script src="jquery-ui.js"></script>
+<script src="script.js"></script>
+<script type="text/javascript" >
+	function randomSort(){
+    	return Math.floor(Math.random()*12)
+	}	
+	var allcards = ['S4','C10','C8','D13','H4','H12','S11','C3','H11','D6','H13','S12','H2','S1','C5','H9','D5','S13','C6','D8','S7','S8','C11','D10','D3','C13','C2','D1','D2','H7','D7','C9','H1','S3','C7','S2','D9','S5','H8','D11','H6','C4','H5','D12','H10','S9','S10','C1','H3','C12','D4','S6']
+	var cards = [[],[],[],[],[],[],[],[]]
+	allcards.sort(randomSort).sort(randomSort)
+	for(i=0;i<4;i++){
+		for(j=0;j<7;j++){
+			cards[i][j] = allcards[(i*7)+j]
+		}		
+	}
+	for(i=4;i<8;i++){
+		for(j=0;j<6;j++){
+			cards[i][j] = allcards[(i*6)+(j+4)]
+		}		
+	}
+//	cards = [['C5','H4','C3','H2','S1'],['D5','S4','D3','C2','D2'],['H1','C4','S3','S2','H5'],['S5','D4','H3','D1','C1']]
+	//cards = [['S4','C10','C8','D13','H4','H12','S11'],['C3','H11','D6','H13','S12','H2','S1'],['C5','H9','D5','S13','C6','D8','S7'],['S8','C11','D10','D3','C13','C2','D1'],['D2','H7','D7','C9','H1','S3'],['C7','S2','D9','S5','H8','D11'],['H6','C4','H5','D12','H10','S9'],['S10','C1','H3','C12','D4','S6']]
+	topOfP =  new Array()
+	topOfT =  new Array()
+	topOfW =  new Array()
+	NUMBER_OF_PLAYSTACKS = 8; 
+	CARDS_IN_PLAYSTACK = 6;
+	MAX_CARD_VALUE = 13;
+	NUMBER_OF_SWAP_AREAS = 4;
+	P = new Array()
+	T = new Array()
+	W = new Array()
+	var dest_id,click,playstack,number,src_id;
+	for(i=0;i<NUMBER_OF_PLAYSTACKS;i++){
+		P[i]=cards[i];
+		if(i<4){
+			topOfP[i] = (CARDS_IN_PLAYSTACK);
+		}
+		else
+			topOfP[i] = (CARDS_IN_PLAYSTACK-1);
+	}
+	for(i=0;i<4;i++){
+		T[i]=['-','-','-','-','-','-','-','-','-','-','-','-']
+		topOfT[i] = 1;			
+	}
+	for(i=0;i<NUMBER_OF_SWAP_AREAS;i++){
+		topOfW[i]=0;	
+	}
+    $(document).ready(function(){
+    		var l;			
+			for(i=0;i<NUMBER_OF_PLAYSTACKS;i++){
+				if(i<4)
+					l = CARDS_IN_PLAYSTACK+1;
+				else
+					l =  CARDS_IN_PLAYSTACK;  			
+				for(j=0;j<l;j++){
+			 		$("#P"+(i+1)).append('<div id="P_'+(i+1)+(j)+'" class="container"><div id="P'+(i+1)+(j)+'"><img id="'+cards[i][j]+'" src="pics/'+cards[i][j]+'.png" alt="cards" width="95" height="160"></div></div>')
+        			var top = (j)*-137  
+        			$("#P_"+(i+1)+(j)).css({'position':'relative','top':top+'px'});	
+        		}	
+        }
+        makePossibleCardsDraggableandDroppable();
+        makePlayStackCardsDraggableAndDroppable();
+    });     
+    function scanForPlacements(){
+    	var flag=0,loopFlag=1;
+    	while(loopFlag==1){
+    	loopFlag=0;
+    	for(i=0;i<4;i++){
+    			if(i==0)
+					val = "C"+topOfT[i]
+				else if(i==1)
+					val = "D"+topOfT[i]
+				else if(i==2)
+					val = "H"+topOfT[i]
+				else if(i==3)
+					val = "S"+topOfT[i]
+				for(j=0;j<8;j++){
+					if(P[j][topOfP[j]]==val){
+						$("#T"+(i+1)).children().each(function(index){$(this).hide()});
+						$("#T"+(i+1)).append($("#P"+(j+1)+(topOfP[j])))
+						$("#P"+(j+1)+(topOfP[j])).css("top","0")
+						$("#P"+(j+1)+(topOfP[j])).css("left","0")
+
+						P[j][topOfP[j]] = '-'  
+						T[i][(topOfT[i]-1)] = $("#P"+(j+1)+(topOfP[j])).children()[0].id; 
+						$("#P"+(j+1)+(topOfP[j])).attr("id","T"+(i+1)+(topOfT[i]-1));
+						$("#P_"+(j+1)+(topOfP[j])).css("visibility","hidden")		
+						topOfT[i]++;
+						topOfP[j]--; 
+						flag=1;
+						loopFlag=1;
+					}
+				}
+				if(flag==0){
+				for(j=0;j<4;j++){
+					if(W[j]==val){
+						$("#T"+(i+1)).children().each(function(index){$(this).hide()});
+						$("#T"+(i+1)).append($("#W"+(j+1)+(topOfW[j]-1)))
+						$("#W"+(j+1)+(topOfW[j]-1)).css("top","0")
+						$("#W"+(j+1)+(topOfW[j]-1)).css("left","0")
+						
+						W[j] = '-'  
+						T[i][(topOfT[i]-1)] = $("#W"+(j+1)+(topOfW[j]-1)).children()[0].id; 
+						$("#W"+(j+1)+(topOfW[j]-1)).attr("id","T"+(i+1)+(topOfT[i]-1));
+						topOfT[i]++;
+						topOfW[j]=0; 
+						loopFlag=1;
+					}
+				}
+				}
+				flag=0;
+			}
+    	}
+    }
+</script>
+</head>
+<body>
+<div style="float:left">
+<div style="float:left">
+<a href="freecell.html" val="New Game" style="color:white; text-decoration:none;">Start New Game</a>
+</div>
+<div style="float: left; position: relative; right: -140px; top: 15px; color: white;"> Swap Space </div>
+<div style="float: left; position: relative; right: -670px; top: 15px;  color: white;"> Target Area<br>
+<div style="float:left">
+<img src="pics/C.png" alt="clubs" style="height:20px; width:20px	">
+<img src="pics/D.png" alt="dice" style="height:20px; width:20px	">
+<img src="pics/H.png" alt="heart" style="height:20px; width:20px	">
+<img src="pics/S.png" alt="spade" style="height:20px; width:20px	"> 
+</div>
+</div>
+</div>
+<br><br><br>
+<div id="W_10" class="swapdeck"></div>
+<div id="W_20" class="swapdeck"></div>
+<div id="W_30" class="swapdeck"></div>
+<div id="W_40" class="swapdeck"></div>
+<div id="T1" class="targetdeck"></div>
+<div id="T2" class="targetdeck"></div>
+<div id="T3" class="targetdeck"></div>
+<div id="T4" class="targetdeck"></div>
+<br>
+<div id="P1" class="deck"></div>
+<div id="P2" class="deck"></div>
+<div id="P3" class="deck"></div>
+<div id="P4" class="deck"></div>
+<div id="P5" class="deck"></div>
+<div id="P6" class="deck"></div>
+<div id="P7" class="deck"></div>
+<div id="P8" class="deck"></div>
+<script type="text/javascript" >
+<!--	$("div").hover(function(){
+		$(this).effect("transfer",{},10)
+	});
+--></script>
+</body>
+</html>

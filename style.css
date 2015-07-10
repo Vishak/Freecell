@@ -1,0 +1,37 @@
+body{
+	background-color: #054;
+}
+.deck { 
+width:97px;
+height: 160px; 
+float:left;
+border: 3px ridge green;
+margin: 25px;
+font-size: 14px;
+border-radius: 15px;
+-moz-border-radius: 15px; /* Firefox 3.6 and earlier */
+}
+.targetdeck { 
+width:97px;
+height: 160px; 
+float:left;
+border: 3px ridge red;
+margin: 25px;
+font-size: 14px;
+border-radius: 15px;
+-moz-border-radius: 15px; /* Firefox 3.6 and earlier */
+}
+.swapdeck { 
+width:97px;
+height: 160px; 
+float:left;
+border: 3px ridge blue;
+font-weight:bolder; 
+margin: 25px;
+border-radius: 15px;
+-moz-border-radius: 15px; /* Firefox 3.6 and earlier */
+}
+.container{
+width:95px;
+height: 160px; 
+}
